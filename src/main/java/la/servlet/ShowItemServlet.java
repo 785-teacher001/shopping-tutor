@@ -49,7 +49,7 @@ public class ShowItemServlet extends HttpServlet {
             	// キーワードによる商品名あいまい検索
             	ItemDAO dao = new ItemDAO();
             	List<ItemBean> list = dao.findByName(keyword);
-                // 取得した商品インスタンスをリクエストスコープに入れてJSPへフォーワードする
+                // 取得した商品リストをリクエストスコープに入れてJSPへフォーワードする
             	request.setAttribute("items", list);
                 gotoPage(request, response, "/list.jsp");
             } else {

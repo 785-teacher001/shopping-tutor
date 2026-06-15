@@ -131,7 +131,11 @@ public class ItemDAO {
 			// 3. SQL実行オブジェクトを取得
 			PreparedStatement pstmt = con.prepareStatement(sql);
 			) {
+<<<<<<< HEAD
 			// 4. パラメータバインディング：キーワードをワイルドカードで囲む
+=======
+			// 4. パラメータバインディング：keywordをワイルドカードで囲む
+>>>>>>> release/step04
 			pstmt.setString(1, "%" + keyword + "%");
 			// 5. SQLの実行と結果セットの取得
 			try (ResultSet rs = pstmt.executeQuery();) {
@@ -142,7 +146,7 @@ public class ItemDAO {
 					String name = rs.getString("name");
 					int price = rs.getInt("price");
 					ItemBean bean = new ItemBean(code, name, price);
-					list .add(bean);
+					list.add(bean);
 				}
 				// 7. 商品リストを返却
 				return list;
