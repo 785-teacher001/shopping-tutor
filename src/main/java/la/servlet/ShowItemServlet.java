@@ -9,7 +9,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import la.bean.CategoryBean;
 import la.bean.ItemBean;
 import la.dao.DAOException;
@@ -33,6 +32,18 @@ public class ShowItemServlet extends HttpServlet {
                 // Listをリクエストスコープに入れてJSPへフォーワードする
                 request.setAttribute("items", list);
                 gotoPage(request, response, "/list.jsp");
+            } else if (action.equals("detail")) {
+            	// リクエストパラメータの取得
+            	String codeString = request.getParameter("code");
+            	// 取得したパラメータのデータ型変換
+            	int code = Integer.parseInt(codeString);
+            	// 詳細表示する商品を取得
+            	ItemDAO dao = new ItemDAO();
+            	ItemBean bean = dao.findByPrimaryKey(code);
+            	// をスコープに登録
+                // 取得した商品インスタンスをリクエストスコープに入れてJSPへフォーワードする
+            	request.setAttribute("item", bean);
+                gotoPage(request, response, "/item.jsp");
             } else {
                 request.setAttribute("message", "正しく操作してください。");
                 gotoPage(request, response, "/errInternal.jsp");
