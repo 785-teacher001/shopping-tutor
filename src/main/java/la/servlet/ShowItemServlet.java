@@ -40,10 +40,19 @@ public class ShowItemServlet extends HttpServlet {
             	// 詳細表示する商品を取得
             	ItemDAO dao = new ItemDAO();
             	ItemBean bean = dao.findByPrimaryKey(code);
-            	// をスコープに登録
                 // 取得した商品インスタンスをリクエストスコープに入れてJSPへフォーワードする
             	request.setAttribute("item", bean);
                 gotoPage(request, response, "/item.jsp");
+            } else if (action.equals("search")) {
+            	// リクエストパラメータを取得
+            	String keyword = request.getParameter("keyword");
+            	// キーワードによる商品名あいまい検索
+            	ItemDAO dao = new ItemDAO();
+            	List<ItemBean> list = dao.findByName(keyword);
+                // 取得した商品リストをリクエストスコープに入れてJSPへフォーワードする
+            	request.setAttribute("items", list);
+                gotoPage(request, response, "/list.jsp");
+            	
             } else {
                 request.setAttribute("message", "正しく操作してください。");
                 gotoPage(request, response, "/errInternal.jsp");

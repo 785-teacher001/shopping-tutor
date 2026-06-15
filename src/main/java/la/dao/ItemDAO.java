@@ -121,4 +121,37 @@ public class ItemDAO {
 			throw new DAOException("レコードの取得に失敗しました。");
         }
     }
+
+	public List<ItemBean> findByName(String keyword) throws DAOException {
+		// 1. 実行するSQLを設定
+		String sql = "SELECT * FROM item WHERE name LIKE ?";
+		try (
+			// 2. データベース接続オブジェクトを取得
+			Connection con = DriverManager.getConnection(url, user, pass);
+			// 3. SQL実行オブジェクトを取得
+			PreparedStatement pstmt = con.prepareStatement(sql);
+			) {
+			// 4. パラメータバインディング：keywordをワイルドカードで囲む
+			pstmt.setString(1, "%" + keyword + "%");
+			// 5. SQLの実行と結果セットの取得
+			try (ResultSet rs = pstmt.executeQuery();) {
+				// 6. 結果セットを商品リストに変換
+				List<ItemBean> list = new ArrayList<>();
+				while (rs.next()) {
+					int code = rs.getInt("code");
+					String name = rs.getString("name");
+					int price = rs.getInt("price");
+					ItemBean bean = new ItemBean(code, name, price);
+					list.add(bean);
+				}
+				// 7. 商品リストを返却
+				return list;
+			}
+		} catch (SQLException e) {
+			// スタックトレースに表示
+			e.printStackTrace();
+			// DAO例外をスロー
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+	}
 }
