@@ -29,6 +29,7 @@
         <option value="5">5
         </select>
         個<br>
+        <a href="/shopping-tutor/ShowItemServlet?action=detail&code=">詳細</a><br>
         <button>カートに追加</button>
     </form>
 </c:forEach>
