@@ -121,6 +121,35 @@ public class ItemDAO {
 			throw new DAOException("レコードの取得に失敗しました。");
         }
     }
+    
+	public int countByCategory(int categoryCode) throws DAOException {
+		// 1. 実行するSQLを設定
+		String sql = "SELECT count(*) FROM item WHERE category_code = ?";
+		try (
+			// 2. データベース接続オブジェクトを取得
+			Connection con = DriverManager.getConnection(url, user, pass);
+			// 3. SQL実行オブジェクトを取得
+			PreparedStatement pstmt = con.prepareStatement(sql);
+			) {
+			// 4. パラメータバインディング
+			pstmt.setInt(1, categoryCode);
+			// 5. SQLの実行と結果セットの取得
+			try (ResultSet rs = pstmt.executeQuery();) {
+				// 6. 結果セットから件数を取得
+				int count = 0;
+				if (rs.next()) {
+					count = rs.getInt(1); // カラムインデックスで取得
+				}
+				// 7. 件数を返却
+				return count;
+			}
+		} catch (SQLException e) {
+			// スタックトレースに表示
+			e.printStackTrace();
+			// DAO例外をスロー
+			throw new DAOException("件数の取得に失敗しました");
+		}
+	}
 
 	public List<ItemBean> findByName(String keyword) throws DAOException {
 		// 1. 実行するSQLを設定
@@ -154,4 +183,34 @@ public class ItemDAO {
 			throw new DAOException("レコードの取得に失敗しました。");
 		}
 	}
+
+	public int countByName(String keyword) throws DAOException {
+		// 1. 実行するSQLを設定
+		String sql = "SELECT count(*) FROM item WHERE name LIKE ?";
+		try (
+			// 2. データベース接続オブジェクトを取得
+			Connection con = DriverManager.getConnection(url, user, pass);
+			// 3. SQL実行オブジェクトを取得
+			PreparedStatement pstmt = con.prepareStatement(sql);
+			) {
+			// 4. パラメータバインディング
+			pstmt.setString(1, "%" + keyword + "%");
+			// 5. SQLの実行と結果セットの取得
+			try (ResultSet rs = pstmt.executeQuery();) {
+				// 6. 結果セットから件数を取得
+				int count = 0;
+				if (rs.next()) {
+					count = rs.getInt(1); // カラムインデックスで取得
+				}
+				// 7. 件数を返却
+				return count;
+			}
+		} catch (SQLException e) {
+			// スタックトレースに表示
+			e.printStackTrace();
+			// DAO例外をスロー
+			throw new DAOException("件数の取得に失敗しました。");
+		}
+	}
+
 }

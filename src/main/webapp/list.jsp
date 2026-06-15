@@ -14,6 +14,8 @@
 
 <h3>商品一覧</h3>
 
+<p>${count}件の商品が存在しました。</p>
+
 <c:forEach items="${items}" var="item">
     <form action="/shopping-tutor/CartServlet?action=add" method="post">
         <input type="hidden" name="item_code" value="${item.code}">
