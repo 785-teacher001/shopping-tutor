@@ -1,0 +1,58 @@
+# GitHubの管理下に置かないファイルのリスト
+# ======================
+# Eclipse
+# ======================
+
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+
+# Eclipse project files
+.project
+.classpath
+.settings/
+
+# ======================
+# Java build files
+# ======================
+
+*.class
+*.jar
+*.war
+*.ear
+
+# ======================
+# Maven
+# ======================
+
+target/
+
+# ======================
+# Gradle
+# ======================
+
+.gradle/
+build/
+
+# ======================
+# Dynamic Web Project
+# ======================
+
+# Tomcatのデプロイ生成物
+Servers/
+
+# Webアプリ生成物
+WebContent/WEB-INF/classes/
+WebContent/WEB-INF/lib/
+
+# ======================
+# OS files
+# ======================
+
+.DS_Store
+Thumbs.db
