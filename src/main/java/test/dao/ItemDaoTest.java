@@ -110,7 +110,7 @@ class ItemDaoTest extends DbSetupTest {
 											  new ItemBean(3, "料理BOOK!", 1200),
 											  new ItemBean(10, "Javaの応用", 2800));
 			// execute
-			List<ItemBean> actual = sut.findByCategoryPage(categoryCode, PAGE_SIZE, page);
+			List<ItemBean> actual = sut.findByCategoryPaged(categoryCode, PAGE_SIZE, page);
 			// verify
 			assertItems(expected, actual);
 		}
@@ -126,7 +126,7 @@ class ItemDaoTest extends DbSetupTest {
 											  new ItemBean(20, "マサカリ担いだ金太郎", 6200),
 											  new ItemBean(21, "金太郎の情報処理合格記", 6400));
 			// execute
-			List<ItemBean> actual = sut.findByCategoryPage(categoryCode, PAGE_SIZE, page);
+			List<ItemBean> actual = sut.findByCategoryPaged(categoryCode, PAGE_SIZE, page);
 			// verify
 			assertItems(expected, actual);
 		}
@@ -139,7 +139,7 @@ class ItemDaoTest extends DbSetupTest {
 			int page = 4;
 			List<ItemBean> expected = List.of(new ItemBean(33, "ソニアの冒険", 2800));
 			// execute
-			List<ItemBean> actual = sut.findByCategoryPage(categoryCode, PAGE_SIZE, page);
+			List<ItemBean> actual = sut.findByCategoryPaged(categoryCode, PAGE_SIZE, page);
 			// verify
 			assertItems(expected, actual);
 		}
@@ -155,7 +155,7 @@ class ItemDaoTest extends DbSetupTest {
 											  new ItemBean(36, "タコライス", 1200),
 											  new ItemBean(37, "ビーフシチュ", 3800));
 			// execute
-			List<ItemBean> actual = sut.findByCategoryPage(categoryCode, PAGE_SIZE, page);
+			List<ItemBean> actual = sut.findByCategoryPaged(categoryCode, PAGE_SIZE, page);
 			// verify
 			assertItems(expected, actual);
 		}
