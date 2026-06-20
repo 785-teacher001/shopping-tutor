@@ -10,9 +10,11 @@ import java.util.List;
 
 import la.bean.CategoryBean;
 import la.bean.ItemBean;
-import la.dao.criteria.AbstractCriteria;
-import la.dao.criteria.CategoryCriteris;
+import la.dao.criteria.CategoryCriteria;
 import la.dao.criteria.NameCriteria;
+import la.dao.query.AbstractQery;
+import la.dao.query.CategoryQuery;
+import la.dao.query.NameQuery;
 
 public class ItemDAO {
 	
@@ -278,12 +280,14 @@ public class ItemDAO {
 	 */
 	public List<ItemBean> findByCategoryPaged(int categoryCode, int pageSize, int page) throws DAOException {
 		// 検索条件クラスのインスタンス化
-		CategoryCriteris criteria = new CategoryCriteris(categoryCode, pageSize, page);
+		CategoryCriteria criteria = new CategoryCriteria(categoryCode, pageSize, page);
+		CategoryQuery query = new CategoryQuery(criteria);
 		// 検索の実行
-		List<ItemBean> list = this.executePaginationQuery(criteria);
+		List<ItemBean> list = this.executePaginationQuery(query);
 		// 検索結果の返却
 		return list;
 	}
+
 
 	/**
 	 * 商品名あいまい検索結果をページ単位で取得する（講師推奨例）
@@ -296,27 +300,28 @@ public class ItemDAO {
 	public List<ItemBean> findByNamePaged(String keyword, int pageSize, int page) throws DAOException {
 		// 検索条件クラスのインスタンス化
 		NameCriteria criteria = new NameCriteria(keyword, pageSize, page);
+		NameQuery query = new NameQuery(criteria);
 		// 検索の実行
-		List<ItemBean> list = this.executePaginationQuery(criteria);
+		List<ItemBean> list = this.executePaginationQuery(query);
 		// 検索結果の返却
 		return list;
 	}
 	
 	/**
 	 * 検索結果をページ単位で取得する
-	 * @param  criteria       検索条件
+	 * @param  query          問い合わせ
 	 * @return List<ItemBean> 商品リスト
 	 * @throws DAOException
 	 */
-	private List<ItemBean> executePaginationQuery(AbstractCriteria criteria) throws DAOException {
+	private List<ItemBean> executePaginationQuery(AbstractQery query) throws DAOException {
 		try (
 			// 1. データベース接続オブジェクトを取得
 			Connection con = DriverManager.getConnection(url, user, pass);
 			// 2. SQL実行オブジェクトを取得
-			PreparedStatement pstmt = con.prepareStatement(criteria.getSql());
+			PreparedStatement pstmt = con.prepareStatement(query.getSql());
 			) {
 			// 4. パラメータバインディング
-			criteria.bind(pstmt);
+			query.bind(pstmt);
 			
 			try (// 5. SQLの実行と結果セットの取得
 				 ResultSet rs = pstmt.executeQuery();

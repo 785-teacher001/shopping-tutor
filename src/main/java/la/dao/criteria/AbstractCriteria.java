@@ -1,8 +1,5 @@
 package la.dao.criteria;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 public abstract class AbstractCriteria {
 	
 	/**
@@ -42,25 +39,25 @@ public abstract class AbstractCriteria {
 		this.page = page;
 	}
 	
-	/**
-	 * オフセット位置を計算する
-	 * @return オフセット位置（スキップ行数）
-	 */
-	protected int calcOffset() {
-		return (this.page - 1) * this.pageSize;
-	}
-	
-	/**
-	 * SQLを取得する
-	 * @return SQL文字列
-	 */
-	public abstract String getSql();
-	
-	/**
-	 * パラメータバインディング
-	 * @param pstmt SQL実行オブジェクト
-	 * @throws SQLException 
-	 */
-	public abstract void bind(PreparedStatement pstmt) throws SQLException;
+//	/**
+//	 * オフセット位置を計算する
+//	 * @return オフセット位置（スキップ行数）
+//	 */
+//	protected int calcOffset() {
+//		return (this.page - 1) * this.pageSize;
+//	}
+//	
+//	/**
+//	 * SQLを取得する
+//	 * @return SQL文字列
+//	 */
+//	public abstract String getSql();
+//	
+//	/**
+//	 * パラメータバインディング
+//	 * @param pstmt SQL実行オブジェクト
+//	 * @throws SQLException 
+//	 */
+//	public abstract void bind(PreparedStatement pstmt) throws SQLException;
 	
 }
