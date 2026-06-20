@@ -122,42 +122,6 @@ public class ItemDAO {
         }
     }
     
-	public List<ItemBean> findByCategoryPaged(int categoryCode, int page) throws DAOException {
-		// 1. 実行するSQLを設定
-		String sql = "SELECT * FROM item WHERE category_code = ? ORDER BY code LIMIT 10 OFFSET ?";
-		try (
-			// 2. データベース接続オブジェクトを取得
-			Connection con = DriverManager.getConnection(url, user, pass);
-			// 3. SQL実行オブジェクトを取得
-			PreparedStatement pstmt = con.prepareStatement(sql);
-			) {
-			// 4. オフセット位置（スキップ数）を掲載
-			int offset = (page - 1) * 10;
-			// 5. パラメータバインディング
-			pstmt.setInt(1, categoryCode);
-			pstmt.setInt(2, offset);
-			// 6. SQLの実行と結果セットの取得
-			try (ResultSet rs = pstmt.executeQuery();) {
-				// 7. 結果セットを商品リストに変換
-				List<ItemBean> list = new ArrayList<ItemBean>();
-				while (rs.next()) {
-					int itemCode = rs.getInt("code");
-					String name = rs.getString("name");
-					int price = rs.getInt("price");
-					ItemBean bean = new ItemBean(itemCode, name, price);
-					list.add(bean);
-				}
-				// 8. 商品リストを返却
-				return list;
-			}
-		} catch (SQLException e) {
-			// スタックトレースに表示
-			e.printStackTrace();
-			// DAO例外をスロー
-			throw new DAOException("レコードの取得に失敗しました。");
-		}
-	}
-
 	public int countByCategory(int categoryCode) throws DAOException {
 		// 1. 実行するSQLを設定
 		String sql = "SELECT count(*) FROM item WHERE category_code = ?";
@@ -249,7 +213,59 @@ public class ItemDAO {
 		}
 	}
 
-	public List<ItemBean> findByCategoryPage(int categoryCode, int pageSize, int page) throws DAOException {
+	/**
+	 * カテゴリ検索結果をページ単位で取得する（模範解答コーディング例）
+	 * @param  categoryCode   カテゴリコード
+	 * @param  page           表示するページ番号（「1」から開始）
+	 * @return List<ItemBean> 商品リスト
+	 * 
+	 * @throws DAOException
+	 */
+	public List<ItemBean> findByCategoryPaged(int categoryCode, int page) throws DAOException {
+		// 1. 実行するSQLを設定
+		String sql = "SELECT * FROM item WHERE category_code = ? ORDER BY code LIMIT 10 OFFSET ?";
+		try (
+			// 2. データベース接続オブジェクトを取得
+			Connection con = DriverManager.getConnection(url, user, pass);
+			// 3. SQL実行オブジェクトを取得
+			PreparedStatement pstmt = con.prepareStatement(sql);
+			) {
+			// 4. オフセット値（スキップ数）を掲載
+			int offset = (page - 1) * 10;
+			// 5. パラメータバインディング
+			pstmt.setInt(1, categoryCode);
+			pstmt.setInt(2, offset);
+			// 6. SQLの実行と結果セットの取得
+			try (ResultSet rs = pstmt.executeQuery();) {
+				// 7. 結果セットを商品リストに変換
+				List<ItemBean> list = new ArrayList<ItemBean>();
+				while (rs.next()) {
+					int itemCode = rs.getInt("code");
+					String name = rs.getString("name");
+					int price = rs.getInt("price");
+					ItemBean bean = new ItemBean(itemCode, name, price);
+					list.add(bean);
+				}
+				// 8. 商品リストを返却
+				return list;
+			}
+		} catch (SQLException e) {
+			// スタックトレースに表示
+			e.printStackTrace();
+			// DAO例外をスロー
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+	}
+
+	/**
+	 * カテゴリ検索結果をページ単位で取得する（講師推奨例）
+	 * @param  categoryCode   カテゴリコード
+	 * @param  pageSize       ページあたり件数
+	 * @param  page           表示するページ番号（「1」から開始）
+	 * @return List<ItemBean> 商品リスト
+	 * @throws DAOException
+	 */
+	public List<ItemBean> findByCategoryPaged(int categoryCode, int pageSize, int page) throws DAOException {
 		// 1. 実行するSQLの設定
 		String sql = "SELECT * FROM item WHERE category_code = ? ORDER BY code LIMIT ? OFFSET ?";
 		try (
@@ -268,7 +284,7 @@ public class ItemDAO {
 				// 6. SQLの実行と結果セットの取得
 				ResultSet rs = pstmt.executeQuery();
 				) {
-				// 7. 結果セットを種品リストに変換
+				// 7. 結果セットを商品リストに変換
 				List<ItemBean> list = new ArrayList<ItemBean>();
 				while (rs.next()) {
 					int code = rs.getInt("code");
@@ -283,11 +299,19 @@ public class ItemDAO {
 		} catch (SQLException e) {
 			// スタックトレースに表示
 			e.printStackTrace();
-			// DAO例以外をスロー
+			// DAO例外をスロー
 			throw new DAOException("レコードの取得に失敗しました。");
 		}
 	}
 
+	/**
+	 * 商品名あいまい検索結果をページ単位で取得する（講師推奨例）
+	 * @param  keyword        検索キーワード
+	 * @param  pageSize       ページあたり件数
+	 * @param  page           表示するページ番号（「1」から開始）
+	 * @return List<ItemBean> 商品リスト
+	 * @throws DAOException
+	 */
 	public List<ItemBean> findByNamePaged(String keyword, int pageSize, int page) throws DAOException {
 		// 1. 実行するSQLの設定
 		String sql = "SELECT * FROM item WHERE name LIKE ? ORDER BY code LIMIT ? OFFSET ?";
@@ -297,7 +321,7 @@ public class ItemDAO {
 			// 3. SQL実行オブジェクトを取得
 			PreparedStatement pstmt = con.prepareStatement(sql);
 			) {
-			// 4. オフセット位置（スキップ件数）の計算
+			// 4. オフセット値（スキップ件数）の計算
 			int offset = (page - 1) * pageSize;
 			// 5. パラメータバインディング
 			pstmt.setString(1, "%" + keyword + "%");
@@ -307,7 +331,7 @@ public class ItemDAO {
 			try ( // 6. SQLの実行と結果セットの取得
 				  ResultSet rs = pstmt.executeQuery();
 				) {
-				// 7. 結果セットを種品リストに変換
+				// 7. 結果セットを商品リストに変換
 				List<ItemBean> list = new ArrayList<ItemBean>();
 				while (rs.next()) {
 					int code = rs.getInt("code");
