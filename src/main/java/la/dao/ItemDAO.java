@@ -10,8 +10,19 @@ import java.util.List;
 
 import la.bean.CategoryBean;
 import la.bean.ItemBean;
+import la.dao.criteria.AbstractCriteria;
+import la.dao.criteria.CategoryCriteris;
+import la.dao.criteria.NameCriteria;
 
 public class ItemDAO {
+	
+	// クラス定数：SQL文字列定数群
+	private static String SQL_FIND_BY_CATEGORY_PAGINATION = "SELECT * FROM item WHERE category_code = ? ORDER BY code LIMIT ? OFFSET ?";
+	private static String SQL_FIND_BY_NAME_PAGINATION = "SELECT * FROM item WHERE name LIKE ? ORDER BY code LIMIT ? OFFSET ?";
+	private static int SEARCH_BY_CATEGORY = 1;
+	private static int SEARCH_BY_NAME = 2;
+	
+	
     // URL、ユーザ名、パスワードの準備
     private String url = "jdbc:postgresql:sample";
     private String user = "student";
@@ -266,42 +277,12 @@ public class ItemDAO {
 	 * @throws DAOException
 	 */
 	public List<ItemBean> findByCategoryPaged(int categoryCode, int pageSize, int page) throws DAOException {
-		// 1. 実行するSQLの設定
-		String sql = "SELECT * FROM item WHERE category_code = ? ORDER BY code LIMIT ? OFFSET ?";
-		try (
-			// 2. データベース接続オブジェクトを取得
-			Connection con = DriverManager.getConnection(url, user, pass);
-			// 3. SQL実行オブジェクトを取得
-			PreparedStatement pstmt = con.prepareStatement(sql);
-			) {
-			// 4. オフセット値（スキップ件数）の計算
-			int offset = (page - 1) * pageSize;
-			// 5. パラメータバインディング
-			pstmt.setInt(1, categoryCode);
-			pstmt.setInt(2, pageSize);
-			pstmt.setInt(3, offset);
-			try (
-				// 6. SQLの実行と結果セットの取得
-				ResultSet rs = pstmt.executeQuery();
-				) {
-				// 7. 結果セットを商品リストに変換
-				List<ItemBean> list = new ArrayList<ItemBean>();
-				while (rs.next()) {
-					int code = rs.getInt("code");
-					String name = rs.getString("name");
-					int price = rs.getInt("price");
-					ItemBean bean = new ItemBean(code, name, price);
-					list.add(bean);
-				}
-				// 8. 商品リストを返却
-				return list;
-			}
-		} catch (SQLException e) {
-			// スタックトレースに表示
-			e.printStackTrace();
-			// DAO例外をスロー
-			throw new DAOException("レコードの取得に失敗しました。");
-		}
+		// 検索条件クラスのインスタンス化
+		CategoryCriteris criteria = new CategoryCriteris(categoryCode, pageSize, page);
+		// 検索の実行
+		List<ItemBean> list = this.executePaginationQuery(criteria);
+		// 検索結果の返却
+		return list;
 	}
 
 	/**
@@ -313,34 +294,36 @@ public class ItemDAO {
 	 * @throws DAOException
 	 */
 	public List<ItemBean> findByNamePaged(String keyword, int pageSize, int page) throws DAOException {
-		// 1. 実行するSQLの設定
-		String sql = "SELECT * FROM item WHERE name LIKE ? ORDER BY code LIMIT ? OFFSET ?";
+		// 検索条件クラスのインスタンス化
+		NameCriteria criteria = new NameCriteria(keyword, pageSize, page);
+		// 検索の実行
+		List<ItemBean> list = this.executePaginationQuery(criteria);
+		// 検索結果の返却
+		return list;
+	}
+	
+	/**
+	 * 検索結果をページ単位で取得する
+	 * @param  criteria       検索条件
+	 * @return List<ItemBean> 商品リスト
+	 * @throws DAOException
+	 */
+	private List<ItemBean> executePaginationQuery(AbstractCriteria criteria) throws DAOException {
 		try (
-			// 2. データベース接続オブジェクトを取得
+			// 1. データベース接続オブジェクトを取得
 			Connection con = DriverManager.getConnection(url, user, pass);
-			// 3. SQL実行オブジェクトを取得
-			PreparedStatement pstmt = con.prepareStatement(sql);
+			// 2. SQL実行オブジェクトを取得
+			PreparedStatement pstmt = con.prepareStatement(criteria.getSql());
 			) {
-			// 4. オフセット値（スキップ件数）の計算
-			int offset = (page - 1) * pageSize;
-			// 5. パラメータバインディング
-			pstmt.setString(1, "%" + keyword + "%");
-			pstmt.setInt(2, pageSize);
-			pstmt.setInt(3, offset);
-
-			try ( // 6. SQLの実行と結果セットの取得
-				  ResultSet rs = pstmt.executeQuery();
+			// 4. パラメータバインディング
+			criteria.bind(pstmt);
+			
+			try (// 5. SQLの実行と結果セットの取得
+				 ResultSet rs = pstmt.executeQuery();
 				) {
-				// 7. 結果セットを商品リストに変換
-				List<ItemBean> list = new ArrayList<ItemBean>();
-				while (rs.next()) {
-					int code = rs.getInt("code");
-					String name = rs.getString("name");
-					int price = rs.getInt("price");
-					ItemBean bean = new ItemBean(code, name, price);
-					list.add(bean);
-				}
-				// 8. 商品リストを返却
+				// 6. 結果セットを種品リストに変換
+				List<ItemBean> list = convertToList(rs);
+				// 7. 商品リストを返却
 				return list;
 			}
 		} catch (SQLException e) {
@@ -349,6 +332,35 @@ public class ItemDAO {
 			// DAO例外のスロー
 			throw new DAOException("レコードの取得に失敗しました。");
 		}
+	}
+	
+	/**
+	 * 結果セットを商品リストに変換する
+	 * @param  rs             結果セット
+	 * @return List<ItemBean> 商品リスト
+	 * @throws SQLException
+	 */
+	private List<ItemBean> convertToList(ResultSet rs) throws SQLException {
+		List<ItemBean> list = new ArrayList<ItemBean>();
+		while (rs.next()) {
+			ItemBean bean = this.convertToBean(rs);
+			list.add(bean);
+		}
+		return list;
+	}
+	
+	/**
+	 * 結果セットの1レコードをItemBeanインスタンスに変換する
+	 * @param  rs       結果セット（現在読み込んでいるレコード）
+	 * @return ItemBean 商品インスタンス
+	 * @throws SQLException
+	 */
+	private ItemBean convertToBean(ResultSet rs) throws SQLException {
+		int code = rs.getInt("code");
+		String name = rs.getString("name");
+		int price = rs.getInt("price");
+		ItemBean bean = new ItemBean(code, name, price);
+		return bean;
 	}
 
 }
