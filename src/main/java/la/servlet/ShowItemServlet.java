@@ -27,13 +27,26 @@ public class ShowItemServlet extends HttpServlet {
                 gotoPage(request, response, "/top.jsp");
             } else if (action.equals("list")) {
                 int categoryCode = Integer.parseInt(request.getParameter("code"));
+                String keyword = request.getParameter("keyword");
+                int page = Integer.parseInt(request.getParameter("page"));
                 ItemDAO dao = new ItemDAO();
-                List<ItemBean> list = dao.findByCategory(categoryCode);
+//                List<ItemBean> list = dao.findByCategory(categoryCode);
+                List<ItemBean> list = dao.findByCategoryPaged(categoryCode, page);
                 // レコード数の取得
                 int count = dao.countByCategory(categoryCode);
+                // 総ページ数の計算
+                int pages = count / 10;
+                if (count % 10 != 0) {
+                	pages++;
+                }
                 // Listをリクエストスコープに入れてJSPへフォーワードする
                 request.setAttribute("items", list);
                 request.setAttribute("count", count);
+                // ペジネーションに関連するパラメータの登録
+                request.setAttribute("pages", pages);       // 総ページ数
+                request.setAttribute("action", action);     // actionキー
+                request.setAttribute("code", categoryCode); // カテゴリコード
+                request.setAttribute("keyword", keyword);   // キーワード（この場合はnull）
                 gotoPage(request, response, "/list.jsp");
             } else if (action.equals("detail")) {
             	// リクエストパラメータの取得
