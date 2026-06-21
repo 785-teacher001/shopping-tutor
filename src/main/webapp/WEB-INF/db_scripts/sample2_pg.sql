@@ -54,3 +54,7 @@ INSERT INTO item(category_code, name, price) VALUES(2, 'Space Wars 3', 1800);
 INSERT INTO item(category_code, name, price) VALUES(3, 'パズルゲーム', 780);
 INSERT INTO item(category_code, name, price) VALUES(3, 'Invader Fighter', 3400);
 INSERT INTO item(category_code, name, price) VALUES(3, 'Play the BascketBall', 2200);
+
+ALTER TABLE customer ADD COLUMN password TEXT DEFAULT 'himitu' NOT NULL;
+INSERT INTO customer (name, address, tel, email, password) VALUES 
+                     ('リスキル太郎', '東京都新宿区', '03-1111-1111', 'reskill@aaa.com', 'himitu');
