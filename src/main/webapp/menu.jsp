@@ -14,3 +14,5 @@
 	<input type="hidden" name="action" value="search">
 	<button>検索</button>
 </form>
+
+<p>ようこそ、${sessionScope.customer.name}さん</p>

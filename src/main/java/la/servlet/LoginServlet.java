@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import la.bean.CustomerBean;
 import la.dao.CustomerDAO;
 import la.dao.DAOException;
@@ -43,10 +44,17 @@ public class LoginServlet extends HttpServlet {
 				CustomerBean customer = dao.findByEmailAndPassword(email, password);
 				// 4. 取得した顧客インスタンスによって遷移先を分岐
 				if (customer != null) {
+					// 認証成功：セッションスコープに
+					// セッションの取得
+					HttpSession session = request.getSession();
+					// 顧客インスタンスをセッションに登録
+					session.setAttribute("customer", customer);
 					// 遷移先URLを設定
-					nextPage = "/top.jsp";
+					nextPage = "/shopping-tutor/ShowItemServlet";
+					response.sendRedirect(nextPage); // ShowItemServlet#init()を呼び出す必要があるのでリダイレクトにする
+					return;
 				} else {
-					// エラーメッセージをスコープに登録
+					// 認証失敗：エラーメッセージをスコープに登録
 					request.setAttribute("message", "メールアドレスとパスワードが一致しませんでした。");
 					// 遷移先URLを設定
 					nextPage = "/login.jsp";
