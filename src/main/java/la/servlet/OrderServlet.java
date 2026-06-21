@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import la.bean.CartBean;
 import la.bean.CustomerBean;
 import la.dao.DAOException;
@@ -44,13 +43,20 @@ public class OrderServlet extends HttpServlet {
                 // input_customerまたはパラメータなしの場合は顧客情報入力ページを表示 
                 gotoPage(request, response, "/customerInfo.jsp");
             } else if (action.equals("confirm")) {
+            	// sessionからユーザ情報（customerキー）を取得
+            	CustomerBean customer = (CustomerBean) session.getAttribute("customer");
+            	// 取得した顧客インスタンスを判定
+            	if (customer == null) {
+            		// ユーザ情報が存在しない場合：ログインページに遷移
+            		gotoPage(request, response, "/login.jsp");
+            	}
                 // confirmは確認処理を行う 
-                CustomerBean bean = new CustomerBean();
-                bean.setName(request.getParameter("name"));
-                bean.setAddress(request.getParameter("address"));
-                bean.setTel(request.getParameter("tel"));
-                bean.setEmail(request.getParameter("email"));
-                session.setAttribute("customer", bean);
+//                CustomerBean bean = new CustomerBean();
+//                bean.setName(request.getParameter("name"));
+//                bean.setAddress(request.getParameter("address"));
+//                bean.setTel(request.getParameter("tel"));
+//                bean.setEmail(request.getParameter("email"));
+//                session.setAttribute("customer", bean);
                 gotoPage(request, response, "/confirm.jsp");
             } else if (action.equals("order")) {
                  // orderは注文確定
