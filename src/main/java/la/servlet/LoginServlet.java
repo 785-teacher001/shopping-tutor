@@ -28,6 +28,8 @@ public class LoginServlet extends HttpServlet {
 		String nextPage = "errInternal.jsp";
 		if (action == null || action.isEmpty()) {
 			nextPage = "login.jsp";
+		} else if (action.equals("login")) {
+			nextPage = "/top.jsp";
 		}
 		gotoPage(request, response, nextPage);
 	}
