@@ -49,7 +49,7 @@ public class LoginServlet extends HttpServlet {
 					HttpSession session = request.getSession();
 					// 顧客インスタンスをセッションに登録
 					session.setAttribute("customer", customer);
-					// 遷移先URLを設定
+					// トップページ（ようこそ画面）にリダイレクト
 					nextPage = "/shopping-tutor/ShowItemServlet";
 					response.sendRedirect(nextPage); // ShowItemServlet#init()を呼び出す必要があるのでリダイレクトにする
 					return;
@@ -58,6 +58,22 @@ public class LoginServlet extends HttpServlet {
 					request.setAttribute("message", "メールアドレスとパスワードが一致しませんでした。");
 					// 遷移先URLを設定
 					nextPage = "/login.jsp";
+				}
+			} else if (action.equals("logout")) {
+				// セッションを取得：引数はfalse
+				HttpSession session = request.getSession(false);
+				// 取得したセッションを判定
+				if (session == null) {
+					// セッションがない場合：エラーページに遷移
+					request.setAttribute("message", "正しい操作をしてください。");
+					nextPage = "/errInternal.jsp";
+				} else {
+					// セッションがある場合
+					session.removeAttribute("customer");
+					// ログイン画面表示にリダイレクト
+					nextPage = "/shopping-tutor/LoginServlet";
+					response.sendRedirect(nextPage);
+					return;
 				}
 			}
 			// 次画面遷移
