@@ -9,7 +9,6 @@ public class CategoryCriteria extends AbstractCriteria {
 	 * フィールド
 	 */
 	private int categoryCode; // カテゴリコード
-
 	
 	/**
 	 * 引数なしコンストラクタ

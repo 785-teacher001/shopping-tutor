@@ -1,24 +1,25 @@
-package la.dao.criteria;
+package la.dao.query.params;
 
-public abstract class AbstractCriteria {
+public abstract class AbstractPaginationParams {
 	
 	/**
 	 * フィールド
 	 */
-	private int pageSize; // ページあたりの表示件数
-	private int page;     // 表示ページ番号
+	private int pageSize; // ページあたり件数
+	private int page;     // 表示するページ番号
 	
 	/**
 	 * 引数なしコンストラクタ
 	 */
-	public AbstractCriteria() {}
+	public AbstractPaginationParams() {}
 
 	/**
 	 * コンストラクタ
-	 * @param pageSize ページあたりの表示件数
-	 * @param page     表示ページ番号
+	 * @param pageSize ページあたり件数
+	 * @param page     表示するページ番号
 	 */
-	public AbstractCriteria(int pageSize, int page) {
+	public AbstractPaginationParams(int pageSize, int page) {
+		super();
 		this.pageSize = pageSize;
 		this.page = page;
 	}

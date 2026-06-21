@@ -3,13 +3,12 @@ package la.dao.query;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import la.dao.criteria.AbstractCriteria;
-import la.dao.criteria.NameCriteria;
+import la.dao.query.params.NameBindParams;
 
 /**
  * 商品名あいまい検索の問い合わせクラス
  */
-public class NameQuery extends AbstractQery {
+public class NameQuery extends AbstractQery<NameBindParams> {
 
 	/** クラス定数：実行するSQL文字列 */
 	private static final String SQL = "SELECT * FROM item WHERE name LIKE ? ORDER BY code LIMIT ? OFFSET ?";
@@ -23,8 +22,8 @@ public class NameQuery extends AbstractQery {
 	 * コンストラクタ
 	 * @param criteria 検索条件
 	 */
-	public NameQuery(AbstractCriteria criteria) {
-		super(criteria);
+	public NameQuery(NameBindParams params) {
+		this.setParams(params);
 	}
 
 	/**
@@ -40,9 +39,8 @@ public class NameQuery extends AbstractQery {
 	 */
 	@Override
 	public void bind(PreparedStatement pstmt) throws SQLException {
-		NameCriteria criteria = (NameCriteria) this.getCriteria();
-		pstmt.setString(1, "%" + criteria.getKeyword() + "%");
-		pstmt.setInt(2, criteria.getPageSize());
+		pstmt.setString(1, "%" + this.getParams().getKeyword() + "%");
+		pstmt.setInt(2, this.getParams().getPageSize());
 		pstmt.setInt(3, this.calcOffset());
 	}
 

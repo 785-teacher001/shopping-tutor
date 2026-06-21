@@ -3,13 +3,12 @@ package la.dao.query;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import la.dao.criteria.AbstractCriteria;
-import la.dao.criteria.CategoryCriteria;
+import la.dao.query.params.CategoryBindParams;
 
 /**
  * カテゴリ検索の問い合せクラス
  */
-public class CategoryQuery extends AbstractQery {
+public class CategoryQuery extends AbstractQery<CategoryBindParams> {
 	
 	/** クラス定数：実行するSQL文字列 */
 	private static final String SQL = "SELECT * FROM item WHERE category_code = ? ORDER BY code LIMIT ? OFFSET ?";
@@ -21,10 +20,10 @@ public class CategoryQuery extends AbstractQery {
 
 	/**
 	 * コンストラクタ
-	 * @param criteria 検索条件
+	 * @param params 検索条件
 	 */
-	public CategoryQuery(AbstractCriteria criteria) {
-		super(criteria);
+	public CategoryQuery(CategoryBindParams params) {
+		this.setParams(params);
 	}
 
 	/**
@@ -40,9 +39,8 @@ public class CategoryQuery extends AbstractQery {
 	 */
 	@Override
 	public void bind(PreparedStatement pstmt) throws SQLException {
-		CategoryCriteria criteria = (CategoryCriteria)this.getCriteria();
-		pstmt.setInt(1, criteria.getCategoryCode());
-		pstmt.setInt(2, criteria.getPageSize());
+		pstmt.setInt(1, this.getParams().getCategoryCode());
+		pstmt.setInt(2, this.getParams().getPageSize());
 		pstmt.setInt(3, this.calcOffset());
 	}
 

@@ -10,20 +10,13 @@ import java.util.List;
 
 import la.bean.CategoryBean;
 import la.bean.ItemBean;
-import la.dao.criteria.CategoryCriteria;
-import la.dao.criteria.NameCriteria;
 import la.dao.query.AbstractQery;
 import la.dao.query.CategoryQuery;
 import la.dao.query.NameQuery;
+import la.dao.query.params.CategoryBindParams;
+import la.dao.query.params.NameBindParams;
 
 public class ItemDAO {
-	
-	// クラス定数：SQL文字列定数群
-	private static String SQL_FIND_BY_CATEGORY_PAGINATION = "SELECT * FROM item WHERE category_code = ? ORDER BY code LIMIT ? OFFSET ?";
-	private static String SQL_FIND_BY_NAME_PAGINATION = "SELECT * FROM item WHERE name LIKE ? ORDER BY code LIMIT ? OFFSET ?";
-	private static int SEARCH_BY_CATEGORY = 1;
-	private static int SEARCH_BY_NAME = 2;
-	
 	
     // URL、ユーザ名、パスワードの準備
     private String url = "jdbc:postgresql:sample";
@@ -280,14 +273,13 @@ public class ItemDAO {
 	 */
 	public List<ItemBean> findByCategoryPaged(int categoryCode, int pageSize, int page) throws DAOException {
 		// 検索条件クラスのインスタンス化
-		CategoryCriteria criteria = new CategoryCriteria(categoryCode, pageSize, page);
-		CategoryQuery query = new CategoryQuery(criteria);
+		CategoryBindParams params = new CategoryBindParams(categoryCode, pageSize, page);
+		CategoryQuery query = new CategoryQuery(params);
 		// 検索の実行
 		List<ItemBean> list = this.executePaginationQuery(query);
 		// 検索結果の返却
 		return list;
 	}
-
 
 	/**
 	 * 商品名あいまい検索結果をページ単位で取得する（講師推奨例）
@@ -299,8 +291,8 @@ public class ItemDAO {
 	 */
 	public List<ItemBean> findByNamePaged(String keyword, int pageSize, int page) throws DAOException {
 		// 検索条件クラスのインスタンス化
-		NameCriteria criteria = new NameCriteria(keyword, pageSize, page);
-		NameQuery query = new NameQuery(criteria);
+		NameBindParams params = new NameBindParams(keyword, pageSize, page);
+		NameQuery query = new NameQuery(params);
 		// 検索の実行
 		List<ItemBean> list = this.executePaginationQuery(query);
 		// 検索結果の返却
@@ -313,6 +305,7 @@ public class ItemDAO {
 	 * @return List<ItemBean> 商品リスト
 	 * @throws DAOException
 	 */
+	@SuppressWarnings("rawtypes")
 	private List<ItemBean> executePaginationQuery(AbstractQery query) throws DAOException {
 		try (
 			// 1. データベース接続オブジェクトを取得

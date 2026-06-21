@@ -3,37 +3,29 @@ package la.dao.query;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import la.dao.criteria.AbstractCriteria;
+import la.dao.query.params.AbstractPaginationParams;
 
 /**
  * 問い合わせクラス
  */
-public abstract class AbstractQery {
+public abstract class AbstractQery<T extends AbstractPaginationParams> {
 	
 	/**
 	 * フィールド
 	 */
-	private AbstractCriteria criteria; // 検索条件クラス
+	private T params; // 検索条件クラス
 	
 	/**
 	 * 引数なしコンストラクタ
 	 */
 	public AbstractQery() {}
 	
-	/**
-	 * コンストラクタ
-	 * @param criteria 検索条件クラス
-	 */
-	public AbstractQery(AbstractCriteria criteria) {
-		this.criteria = criteria; // 検索条件クラス
+	public T getParams() {
+		return params;
 	}
-
-	public AbstractCriteria getCriteria() {
-		return criteria;
-	}
-
-	public void setCriteria(AbstractCriteria criteria) {
-		this.criteria = criteria;
+	
+	public void setParams(T params) {
+		this.params = params;
 	}
 
 	/**
@@ -41,8 +33,8 @@ public abstract class AbstractQery {
 	 * @return オフセット位置（スキップ件数）
 	 */
 	protected int calcOffset() {
-		int page = this.getCriteria().getPage();
-		int pageSize = this.getCriteria().getPageSize();
+		int page = this.getParams().getPage();
+		int pageSize = this.getParams().getPageSize();
 		return (page - 1) * pageSize;
 	}
 	
