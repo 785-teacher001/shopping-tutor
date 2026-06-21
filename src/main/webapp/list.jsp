@@ -1,7 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<%
+/*
+request.setAttribute("count", 1);
+request.setAttribute("pages", 10);
+request.setAttribute("action", "search");
+request.setAttribute("code", null);
+request.setAttribute("keyword", "B");
+*/
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,6 +42,10 @@
         <a href="/shopping-tutor/ShowItemServlet?action=detail&code=${item.code}">詳細</a><br>
         <button>カートに追加</button>
     </form>
+</c:forEach>
+
+<c:forEach begin="1" end="${pages}" varStatus="page">
+	<a href="/shopping-tutor/ShowItemServlet?action=${action}&code=${code}&keyword=${keyword}&page=${pageScope.page.count}">${pageScope.page.count}</a>
 </c:forEach>
 
 </body>
