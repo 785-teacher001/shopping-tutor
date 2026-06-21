@@ -8,6 +8,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import la.bean.CustomerBean;
+import la.dao.CustomerDAO;
+import la.dao.DAOException;
 
 /**
  * Servlet implementation class LoginServlet
@@ -26,19 +29,42 @@ public class LoginServlet extends HttpServlet {
 		String action = request.getParameter("action");
 		// 3. actionキーの値によって処理を分岐：遷移先URLを格納する変数を初期化
 		String nextPage = "errInternal.jsp";
-		if (action == null || action.isEmpty()) {
-			nextPage = "login.jsp";
-		} else if (action.equals("login")) {
-			nextPage = "/top.jsp";
+		
+		try {
+			if (action == null || action.isEmpty()) {
+				nextPage = "login.jsp";
+			} else if (action.equals("login")) {
+				// 1. リクエストパラメータを取得
+				String email = request.getParameter("email");
+				String password = request.getParameter("password");
+				// 2. CustomerDAOをインスタンス化
+				CustomerDAO dao = new CustomerDAO();
+				// 3. リクエストパラメータをもとに顧客インスタンスを取得
+				CustomerBean customer = dao.findByEmailAndPassword(email, password);
+				// 4. 取得した顧客インスタンスによって遷移先を分岐
+				if (customer != null) {
+					// 遷移先URLを設定
+					nextPage = "/top.jsp";
+				} else {
+					// エラーメッセージをスコープに登録
+					request.setAttribute("message", "メールアドレスとパスワードが一致しませんでした。");
+					// 遷移先URLを設定
+					nextPage = "/login.jsp";
+				}
+			}
+			// 次画面遷移
+			gotoPage(request, response, nextPage);
+		} catch (DAOException e) {
+            e.printStackTrace();
+            request.setAttribute("message", "内部エラーが発生しました。");
+            gotoPage(request, response, "/errInternal.jsp");
 		}
-		gotoPage(request, response, nextPage);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 
