@@ -56,3 +56,6 @@ WebContent/WEB-INF/lib/
 
 .DS_Store
 Thumbs.db
+
+# その他
+temp/

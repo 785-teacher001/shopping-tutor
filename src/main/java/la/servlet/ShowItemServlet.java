@@ -17,6 +17,8 @@ import la.dao.ItemDAO;
 @WebServlet("/ShowItemServlet")
 public class ShowItemServlet extends HttpServlet {
 
+	private static final int PAGE_SIZE = 4;
+	
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -26,14 +28,43 @@ public class ShowItemServlet extends HttpServlet {
                 // topまたはパラメータなしの場合はトップページを表示 
                 gotoPage(request, response, "/top.jsp");
             } else if (action.equals("list")) {
-                int categoryCode = Integer.parseInt(request.getParameter("code"));
+            	// リクエストパラメータの取得
+            	int categoryCode = 0;
+            	try {
+            		categoryCode = Integer.parseInt(request.getParameter("code"));
+            	} catch (NumberFormatException e) {
+                	//ここではなにも例外処理をしない→例外が発生した場合は初期値のままで実行
+            	}
+            	
+                String keyword = request.getParameter("keyword");
+                
+                int page = 1;
+                try {
+                	page = Integer.parseInt(request.getParameter("page"));
+                } catch (NumberFormatException e ) {
+                	//ここではなにも例外処理をしない→例外が発生した場合は初期値のままで実行
+                }
+                
                 ItemDAO dao = new ItemDAO();
-                List<ItemBean> list = dao.findByCategory(categoryCode);
+                List<ItemBean> list = dao.findByCategoryPagination(categoryCode, PAGE_SIZE, page);
+                
                 // レコード数の取得
                 int count = dao.countByCategory(categoryCode);
+                
+                // 総ページ数の取得
+                int pages = (count + PAGE_SIZE - 1)/ PAGE_SIZE;
+                
                 // Listをリクエストスコープに入れてJSPへフォーワードする
                 request.setAttribute("items", list);
                 request.setAttribute("count", count);
+                
+                // ページネーション関連のパラメータを登録
+                request.setAttribute("pages", pages);       // 総ページ数
+                request.setAttribute("action", action);     // actionキー
+                request.setAttribute("code", categoryCode); // カテゴリコード
+                request.setAttribute("keyword", keyword);   // キーワード
+                
+                // 画面遷移
                 gotoPage(request, response, "/list.jsp");
             } else if (action.equals("detail")) {
             	// リクエストパラメータの取得
@@ -48,15 +79,42 @@ public class ShowItemServlet extends HttpServlet {
                 gotoPage(request, response, "/item.jsp");
             } else if (action.equals("search")) {
             	// リクエストパラメータを取得
-            	String keyword = request.getParameter("keyword");
+            	int categoryCode = 0;
+            	try {
+            		categoryCode = Integer.parseInt(request.getParameter("code"));
+                } catch (NumberFormatException e ) {
+                	//ここではなにも例外処理をしない→例外が発生した場合は初期値のままで実行
+                }
+            	
+                String keyword = request.getParameter("keyword");
+                
+                int page = 1;
+                try {
+                	page = Integer.parseInt(request.getParameter("page"));
+                } catch (NumberFormatException e ) {
+                	//ここではなにも例外処理をしない→例外が発生した場合は初期値のままで実行
+                }
+                
             	// キーワードによる商品名あいまい検索
             	ItemDAO dao = new ItemDAO();
-            	List<ItemBean> list = dao.findByName(keyword);
+            	List<ItemBean> list = dao.findByNamePagination(keyword, PAGE_SIZE, page);
             	// レコード数の取得
             	int count = dao.countByName(keyword);
+                
+            	// 総ページ数の取得
+                int pages = (count + PAGE_SIZE - 1 ) / PAGE_SIZE;
+                
                 // 取得した商品リストをリクエストスコープに入れてJSPへフォーワードする
             	request.setAttribute("items", list);
             	request.setAttribute("count", count);
+            	
+                // ページネーション関連のパラメータを登録
+                request.setAttribute("pages", pages);       // 総ページ数
+                request.setAttribute("action", action);     // actionキー
+                request.setAttribute("code", categoryCode); // カテゴリコード
+                request.setAttribute("keyword", keyword);   // キーワード
+                
+                // 画面遷移
                 gotoPage(request, response, "/list.jsp");
             } else {
                 request.setAttribute("message", "正しく操作してください。");
